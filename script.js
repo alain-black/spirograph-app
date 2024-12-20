@@ -5,9 +5,14 @@ const innerRadiusInput = document.getElementById('innerRadius');
 const penPositionInput = document.getElementById('penPosition');
 const drawButton = document.getElementById('drawButton');
 
-// Adjust canvas size to fit the window without scrolling
-canvas.width = window.innerWidth * 0.8;
-canvas.height = window.innerHeight * 0.8;
+// Set canvas size to fit browser height and make it a square
+function resizeCanvas() {
+  const size = window.innerHeight;
+  canvas.width = size;
+  canvas.height = size;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
 function drawSpirographAnimated(R, r, p) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
