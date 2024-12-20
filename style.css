@@ -1,22 +1,48 @@
 body {
-  text-align: center;
-  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f0f0f0;
   overflow: hidden;
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
 }
 
 canvas {
   display: block;
-  margin: 20px auto;
-  border: 1px solid black;
+  margin: 0 auto;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 #controls {
-  margin: 20px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 label {
   display: block;
-  margin: 10px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
