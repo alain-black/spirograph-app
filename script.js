@@ -25,8 +25,6 @@ function drawSpirographAnimated(R, r, p) {
   const cy = canvas.height / 2;
   let t = 0;
 
-  ctx.lineWidth = 1;
-
   function drawFrame() {
     if (t >= Math.PI * 2 * r / gcd(R, r)) {
       cancelAnimationFrame(animationFrameId);
@@ -49,21 +47,44 @@ function drawSpirographAnimated(R, r, p) {
     ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
     ctx.stroke();
 
-    // ペンの位置
-    const penX = innerX + p * r * Math.cos(((R - r) / r) * t);
-    const penY = innerY - p * r * Math.sin(((R - r) / r) * t);
+    // 外側の円を回るスピログラフ
+    const outerX = cx + (R + r) * Math.cos(t);
+    const outerY = cy + (R + r) * Math.sin(t);
+
+    const outerPenX = outerX + p * r * Math.cos(((R + r) / r) * t);
+    const outerPenY = outerY - p * r * Math.sin(((R + r) / r) * t);
+    ctx.strokeStyle = "orange";
+    ctx.beginPath();
+    ctx.moveTo(outerX, outerY);
+    ctx.lineTo(outerPenX, outerPenY);
+    ctx.stroke();
+
+    // ペンの位置（内側）
+    const innerPenX = innerX + p * r * Math.cos(((R - r) / r) * t);
+    const innerPenY = innerY - p * r * Math.sin(((R - r) / r) * t);
     ctx.strokeStyle = "red";
     ctx.beginPath();
     ctx.moveTo(innerX, innerY);
-    ctx.lineTo(penX, penY);
+    ctx.lineTo(innerPenX, innerPenY);
     ctx.stroke();
 
-    // スピログラフの描画
+    // スピログラフの描画（内側）
     ctx.strokeStyle = "blue";
     ctx.beginPath();
     for (let i = 0; i <= t; i += 0.01) {
       const x = cx + (R - r) * Math.cos(i) + p * r * Math.cos(((R - r) / r) * i);
       const y = cy + (R - r) * Math.sin(i) - p * r * Math.sin(((R - r) / r) * i);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+
+    // スピログラフの描画（外側）
+    ctx.strokeStyle = "green";
+    ctx.beginPath();
+    for (let i = 0; i <= t; i += 0.01) {
+      const x = cx + (R + r) * Math.cos(i) + p * r * Math.cos(((R + r) / r) * i);
+      const y = cy + (R + r) * Math.sin(i) - p * r * Math.sin(((R + r) / r) * i);
       if (i === 0) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
