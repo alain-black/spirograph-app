@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スピログラフデザインアプリ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>スピログラフデザイナー</h1>
+  <canvas id="spiroCanvas" width="800" height="800"></canvas>
+  <div id="controls">
+    <label>
+      外側の半径:
+      <input type="range" id="outerRadius" min="50" max="400" value="200">
+    </label>
+    <label>
+      内側の半径:
+      <input type="range" id="innerRadius" min="10" max="100" value="50">
+    </label>
+    <label>
+      ペンの位置:
+      <input type="range" id="penPosition" min="0" max="1" step="0.01" value="0.5">
+    </label>
+    <button id="drawButton">描画</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
