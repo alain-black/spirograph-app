@@ -6,13 +6,15 @@ const penPositionInput = document.getElementById('penPosition');
 const drawButton = document.getElementById('drawButton');
 
 // Set canvas size to fit browser height and make it a square
+// キャンバスサイズをブラウザの高さに基づいた正方形に設定
 function resizeCanvas() {
-  const size = window.innerHeight;
+  const size = Math.min(window.innerWidth, window.innerHeight);
   canvas.width = size;
   canvas.height = size;
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
+
 
 function drawSpirographAnimated(R, r, p) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
