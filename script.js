@@ -17,6 +17,36 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
+// スピログラフを描画する関数（静的表示）
+function drawSpirographStatic(R, r, p) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  // 外側の円
+  ctx.strokeStyle = "gray";
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // 内側の円
+  const innerX = cx + (R - r) * Math.cos(0);
+  const innerY = cy + (R - r) * Math.sin(0);
+  ctx.beginPath();
+  ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // ペンの位置
+  const penX = innerX + p * r * Math.cos(0);
+  const penY = innerY - p * r * Math.sin(0);
+  ctx.strokeStyle = "red";
+  ctx.beginPath();
+  ctx.moveTo(innerX, innerY);
+  ctx.lineTo(penX, penY);
+  ctx.stroke();
+}
+
 // スピログラフを描画する関数（アニメーション付き）
 function drawSpirographAnimated(R, r, p) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -93,5 +123,9 @@ drawButton.addEventListener('click', () => {
   drawSpirographAnimated(R, r, p);
 });
 
-// 初期状態では描画なし
-ctx.clearRect(0, 0, canvas.width, canvas.height);
+// 初期状態で静的なスピログラフを表示
+drawSpirographStatic(
+  parseFloat(outerRadiusInput.value),
+  parseFloat(innerRadiusInput.value),
+  parseFloat(penPositionInput.value)
+);
