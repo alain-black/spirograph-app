@@ -13,11 +13,13 @@ canvas {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
+  height: 100vh; /* 縦のブラウザサイズを基準に正方形に */
+  width: 100vh; /* 高さと同じサイズに設定 */
 }
 
 #controls {
-  position: absolute;
-  bottom: 20px;
+  position: fixed; /* 固定配置に変更 */
+  bottom: 20px;    /* ブラウザ右下に配置 */
   right: 20px;
   background: white;
   border: 1px solid #ccc;
