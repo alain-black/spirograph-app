@@ -18,8 +18,8 @@ canvas {
 }
 
 #controls {
-  position: fixed; /* 固定配置 */
-  bottom: 20px;    /* ブラウザ右下 */
+  position: fixed;
+  bottom: 20px;
   right: 20px;
   background: white;
   border: 1px solid #ccc;
@@ -27,12 +27,26 @@ canvas {
   padding: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   display: flex;
-  flex-direction: column; /* 縦に積む形に変更 */
-  gap: 10px;             /* 各要素間の余白 */
+  flex-direction: column;
+  gap: 10px;
 }
 
 label {
   display: flex;
   flex-direction: column;
   font-size: 14px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
