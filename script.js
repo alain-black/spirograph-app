@@ -1,11 +1,14 @@
+// 初期設定
 const canvas = document.getElementById('spiroCanvas');
 const ctx = canvas.getContext('2d');
-const innerRadiusInput = document.getElementById('innerRadius');
 const outerRadiusInput = document.getElementById('outerRadius');
-const innerPenPositionInput = document.getElementById('innerPenPosition');
+const innerRadiusInput = document.getElementById('innerRadius');
+const penPositionInput = document.getElementById('penPosition');
 const drawButton = document.getElementById('drawButton');
 
-// キャンバスサイズを調整
+let animationFrameId = null; // アニメーション用のID
+
+// キャンバスサイズをブラウザの高さに基づいた正方形に設定
 function resizeCanvas() {
   const size = Math.min(window.innerWidth, window.innerHeight);
   canvas.width = size;
@@ -14,61 +17,81 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// スピログラフの描画
-function drawSpirograph(innerR, outerR, penPos) {
+// スピログラフを描画する関数（アニメーション付き）
+function drawSpirographAnimated(R, r, p) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const cx = canvas.width / 2; // キャンバスの中心X座標
-  const cy = canvas.height / 2; // キャンバスの中心Y座標
-  let t = 0; // 描画の進行角度
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+  let t = 0;
 
-  // 最大公約数を利用してスピログラフの完全な描画範囲を決定
-  const totalSteps = Math.PI * 2 * innerR / gcd(innerR, outerR);
+  ctx.lineWidth = 1;
 
-  ctx.beginPath();
-
-  function animate() {
-    // 終了条件: 描画が一周したら停止
-    if (t > totalSteps) {
-      ctx.stroke();
-      return;
+  function drawFrame() {
+    if (t >= Math.PI * 2 * r / gcd(R, r)) {
+      cancelAnimationFrame(animationFrameId);
+      return; // 描画終了
     }
 
-    // 内側の円の中心位置を計算
-    const innerX = cx + (outerR - innerR) * Math.cos(t);
-    const innerY = cy + (outerR - innerR) * Math.sin(t);
+    // 全体クリア
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // ペンの位置を計算
-    const penX =
-      innerX +
-      penPos * innerR * Math.cos((outerR - innerR) / innerR * t);
-    const penY =
-      innerY -
-      penPos * innerR * Math.sin((outerR - innerR) / innerR * t);
+    // 外側の円
+    ctx.strokeStyle = "gray";
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.stroke();
 
-    if (t === 0) {
-      ctx.moveTo(penX, penY);
-    } else {
-      ctx.lineTo(penX, penY);
+    // 内側の円
+    const innerX = cx + (R - r) * Math.cos(t);
+    const innerY = cy + (R - r) * Math.sin(t);
+    ctx.beginPath();
+    ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // ペンの位置
+    const penX = innerX + p * r * Math.cos(((R - r) / r) * t);
+    const penY = innerY - p * r * Math.sin(((R - r) / r) * t);
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(innerX, innerY);
+    ctx.lineTo(penX, penY);
+    ctx.stroke();
+
+    // スピログラフの描画
+    ctx.strokeStyle = "blue";
+    ctx.beginPath();
+    for (let i = 0; i <= t; i += 0.01) {
+      const x = cx + (R - r) * Math.cos(i) + p * r * Math.cos(((R - r) / r) * i);
+      const y = cy + (R - r) * Math.sin(i) - p * r * Math.sin(((R - r) / r) * i);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     }
+    ctx.stroke();
 
-    t += 0.02; // 描画速度調整
-    requestAnimationFrame(animate);
+    t += 0.02;
+    animationFrameId = requestAnimationFrame(drawFrame);
   }
 
-  animate();
+  drawFrame();
 }
 
-// 最大公約数を計算する関数
+// 最大公約数を求める関数
 function gcd(a, b) {
   return b === 0 ? a : gcd(b, a % b);
 }
 
-// 描画ボタンのクリックイベント
+// 描画ボタンを押したときの挙動
 drawButton.addEventListener('click', () => {
-  const innerR = parseFloat(innerRadiusInput.value);
-  const outerR = parseFloat(outerRadiusInput.value);
-  const penPos = parseFloat(innerPenPositionInput.value);
+  // アニメーション中断（再描画時にクリア）
+  cancelAnimationFrame(animationFrameId);
 
-  drawSpirograph(innerR, outerR, penPos);
+  const R = parseFloat(outerRadiusInput.value);
+  const r = parseFloat(innerRadiusInput.value);
+  const p = parseFloat(penPositionInput.value);
+
+  drawSpirographAnimated(R, r, p);
 });
+
+// 初期状態では描画なし
+ctx.clearRect(0, 0, canvas.width, canvas.height);
