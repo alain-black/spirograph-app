@@ -1,3 +1,4 @@
+// HTML, CSS, and script integration is assumed.
 const canvas = document.getElementById('spiroCanvas');
 const ctx = canvas.getContext('2d');
 const innerRadiusInput = document.getElementById('innerRadius');
@@ -5,8 +6,6 @@ const outerRadiusInput = document.getElementById('outerRadius');
 const innerPenPositionInput = document.getElementById('innerPenPosition');
 const outerPenPositionInput = document.getElementById('outerPenPosition');
 const drawButton = document.getElementById('drawButton');
-
-let animationFrameId = null;
 
 // キャンバスサイズを調整
 function resizeCanvas() {
@@ -17,30 +16,42 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
+// 最大公約数を計算する関数
+function gcd(a, b) {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
 // スピログラフ描画
-function drawSpirographAnimated(innerR, outerR, innerP, outerP) {
+function drawSpirograph(innerR, outerR, innerP, outerP) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.beginPath();
 
-  const cx = canvas.width / 2;
-  const cy = canvas.height / 2;
-  let t = 0;
+  const cx = canvas.width / 2; // キャンバスの中心X
+  const cy = canvas.height / 2; // キャンバスの中心Y
+  const lcm = Math.PI * 2 * innerR / gcd(innerR, outerR); // 一周分の角度計算
 
-  function drawFrame() {
-    if (t >= Math.PI * 2 * innerR / gcd(outerR, innerR)) {
-      cancelAnimationFrame(animationFrameId);
-      return;
+  for (let t = 0; t <= lcm; t += 0.01) {
+    const x = cx + (outerR - innerR) * Math.cos(t) + innerP * innerR * Math.cos((outerR - innerR) / innerR * t);
+    const y = cy + (outerR - innerR) * Math.sin(t) - innerP * innerR * Math.sin((outerR - innerR) / innerR * t);
+    
+    if (t === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
     }
+  }
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.strokeStyle = "blue";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
 
-    // 描画範囲の中心点
-    const drawCenterX = cx;
-    const drawCenterY = cy;
+// 描画ボタンのイベントリスナー
+drawButton.addEventListener('click', () => {
+  const innerR = parseFloat(innerRadiusInput.value);
+  const outerR = parseFloat(outerRadiusInput.value);
+  const innerP = parseFloat(innerPenPositionInput.value);
+  const outerP = parseFloat(outerPenPositionInput.value);
 
-    // 内側の円
-    const innerX = drawCenterX + (outerR - innerR) * Math.cos(t);
-    const innerY = drawCenterY + (outerR - innerR) * Math.sin(t);
-
-    ctx.strokeStyle = "red";
-
-    //
+  drawSpirograph(innerR, outerR, innerP, outerP);
+});
