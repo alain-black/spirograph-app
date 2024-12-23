@@ -1,14 +1,14 @@
-// 初期設定
 const canvas = document.getElementById('spiroCanvas');
 const ctx = canvas.getContext('2d');
-const outerRadiusInput = document.getElementById('outerRadius');
 const innerRadiusInput = document.getElementById('innerRadius');
-const penPositionInput = document.getElementById('penPosition');
+const outerRadiusInput = document.getElementById('outerRadius');
+const innerPenPositionInput = document.getElementById('innerPenPosition');
+const outerPenPositionInput = document.getElementById('outerPenPosition');
 const drawButton = document.getElementById('drawButton');
 
-let animationFrameId = null; // アニメーション用のID
+let animationFrameId = null;
 
-// キャンバスサイズをブラウザの高さに基づいた正方形に設定
+// キャンバスサイズを調整
 function resizeCanvas() {
   const size = Math.min(window.innerWidth, window.innerHeight);
   canvas.width = size;
@@ -17,8 +17,8 @@ function resizeCanvas() {
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// スピログラフを描画する関数（アニメーション付き）
-function drawSpirographAnimated(R, r, p) {
+// スピログラフ描画
+function drawSpirographAnimated(innerR, outerR, innerP, outerP) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const cx = canvas.width / 2;
@@ -26,93 +26,21 @@ function drawSpirographAnimated(R, r, p) {
   let t = 0;
 
   function drawFrame() {
-    if (t >= Math.PI * 2 * r / gcd(R, r)) {
+    if (t >= Math.PI * 2 * innerR / gcd(outerR, innerR)) {
       cancelAnimationFrame(animationFrameId);
-      return; // 描画終了
+      return;
     }
 
-    // 全体クリア
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 外側の円
-    ctx.strokeStyle = "gray";
-    ctx.beginPath();
-    ctx.arc(cx, cy, R, 0, Math.PI * 2);
-    ctx.stroke();
+    // 描画範囲の中心点
+    const drawCenterX = cx;
+    const drawCenterY = cy;
 
     // 内側の円
-    const innerX = cx + (R - r) * Math.cos(t);
-    const innerY = cy + (R - r) * Math.sin(t);
-    ctx.beginPath();
-    ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
-    ctx.stroke();
+    const innerX = drawCenterX + (outerR - innerR) * Math.cos(t);
+    const innerY = drawCenterY + (outerR - innerR) * Math.sin(t);
 
-    // 外側の円を回るスピログラフ
-    const outerX = cx + (R + r) * Math.cos(t);
-    const outerY = cy + (R + r) * Math.sin(t);
-
-    const outerPenX = outerX + p * r * Math.cos(((R + r) / r) * t);
-    const outerPenY = outerY - p * r * Math.sin(((R + r) / r) * t);
-    ctx.strokeStyle = "orange";
-    ctx.beginPath();
-    ctx.moveTo(outerX, outerY);
-    ctx.lineTo(outerPenX, outerPenY);
-    ctx.stroke();
-
-    // ペンの位置（内側）
-    const innerPenX = innerX + p * r * Math.cos(((R - r) / r) * t);
-    const innerPenY = innerY - p * r * Math.sin(((R - r) / r) * t);
     ctx.strokeStyle = "red";
-    ctx.beginPath();
-    ctx.moveTo(innerX, innerY);
-    ctx.lineTo(innerPenX, innerPenY);
-    ctx.stroke();
 
-    // スピログラフの描画（内側）
-    ctx.strokeStyle = "blue";
-    ctx.beginPath();
-    for (let i = 0; i <= t; i += 0.01) {
-      const x = cx + (R - r) * Math.cos(i) + p * r * Math.cos(((R - r) / r) * i);
-      const y = cy + (R - r) * Math.sin(i) - p * r * Math.sin(((R - r) / r) * i);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-
-    // スピログラフの描画（外側）
-    ctx.strokeStyle = "green";
-    ctx.beginPath();
-    for (let i = 0; i <= t; i += 0.01) {
-      const x = cx + (R + r) * Math.cos(i) + p * r * Math.cos(((R + r) / r) * i);
-      const y = cy + (R + r) * Math.sin(i) - p * r * Math.sin(((R + r) / r) * i);
-      if (i === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
-
-    t += 0.02;
-    animationFrameId = requestAnimationFrame(drawFrame);
-  }
-
-  drawFrame();
-}
-
-// 最大公約数を求める関数
-function gcd(a, b) {
-  return b === 0 ? a : gcd(b, a % b);
-}
-
-// 描画ボタンを押したときの挙動
-drawButton.addEventListener('click', () => {
-  // アニメーション中断（再描画時にクリア）
-  cancelAnimationFrame(animationFrameId);
-
-  const R = parseFloat(outerRadiusInput.value);
-  const r = parseFloat(innerRadiusInput.value);
-  const p = parseFloat(penPositionInput.value);
-
-  drawSpirographAnimated(R, r, p);
-});
-
-// 初期状態では描画なし
-ctx.clearRect(0, 0, canvas.width, canvas.height);
+    //
