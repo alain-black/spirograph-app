@@ -1,4 +1,3 @@
-// 初期設定
 const canvas = document.getElementById('spiroCanvas');
 const ctx = canvas.getContext('2d');
 const outerRadiusInput = document.getElementById('outerRadius');
@@ -6,18 +5,15 @@ const innerRadiusInput = document.getElementById('innerRadius');
 const penPositionInput = document.getElementById('penPosition');
 const drawButton = document.getElementById('drawButton');
 
-let animationFrameId = null; // アニメーション用のID
-
-// キャンバスサイズをブラウザの高さに基づいた正方形に設定
+// Set canvas size to fit browser height and make it a square
 function resizeCanvas() {
-  const size = Math.min(window.innerWidth, window.innerHeight);
+  const size = window.innerHeight;
   canvas.width = size;
   canvas.height = size;
 }
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
-// スピログラフを描画する関数（アニメーション付き）
 function drawSpirographAnimated(R, r, p) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -29,27 +25,23 @@ function drawSpirographAnimated(R, r, p) {
 
   function drawFrame() {
     if (t >= Math.PI * 2 * r / gcd(R, r)) {
-      cancelAnimationFrame(animationFrameId);
-      return; // 描画終了
+      return;
     }
 
-    // 全体クリア
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 外側の円
+    // Draw circles for visual guidance
     ctx.strokeStyle = "gray";
     ctx.beginPath();
-    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.arc(cx, cy, R, 0, Math.PI * 2); // Outer circle
     ctx.stroke();
-
-    // 内側の円
+    ctx.beginPath();
     const innerX = cx + (R - r) * Math.cos(t);
     const innerY = cy + (R - r) * Math.sin(t);
-    ctx.beginPath();
-    ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
+    ctx.arc(innerX, innerY, r, 0, Math.PI * 2); // Inner circle
     ctx.stroke();
 
-    // ペンの位置
+    // Draw guiding lines
     const penX = innerX + p * r * Math.cos(((R - r) / r) * t);
     const penY = innerY - p * r * Math.sin(((R - r) / r) * t);
     ctx.strokeStyle = "red";
@@ -58,7 +50,7 @@ function drawSpirographAnimated(R, r, p) {
     ctx.lineTo(penX, penY);
     ctx.stroke();
 
-    // スピログラフの描画
+    // Draw the spirograph
     ctx.strokeStyle = "blue";
     ctx.beginPath();
     for (let i = 0; i <= t; i += 0.01) {
@@ -70,28 +62,19 @@ function drawSpirographAnimated(R, r, p) {
     ctx.stroke();
 
     t += 0.02;
-    animationFrameId = requestAnimationFrame(drawFrame);
+    requestAnimationFrame(drawFrame);
   }
 
   drawFrame();
 }
 
-// 最大公約数を求める関数
 function gcd(a, b) {
   return b === 0 ? a : gcd(b, a % b);
 }
 
-// 描画ボタンを押したときの挙動
 drawButton.addEventListener('click', () => {
-  // アニメーション中断（再描画時にクリア）
-  cancelAnimationFrame(animationFrameId);
-
   const R = parseFloat(outerRadiusInput.value);
   const r = parseFloat(innerRadiusInput.value);
   const p = parseFloat(penPositionInput.value);
-
   drawSpirographAnimated(R, r, p);
 });
-
-// 初期状態では描画なし
-ctx.clearRect(0, 0, canvas.width, canvas.height);
