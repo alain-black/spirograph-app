@@ -61,50 +61,34 @@ function drawSpirographAnimated(R, r, p) {
   ctx.lineWidth = 1;
 
   function drawFrame() {
-    if (t >= Math.PI * 2 * r / gcd(R, r)) {
+    const maxT = Math.PI * 2 * r / gcd(R, r); // スピログラフが1周する最大時間
+
+    if (t >= maxT) {
       cancelAnimationFrame(animationFrameId);
       return; // 描画終了
     }
 
-    // 全体クリア
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 外側の円
-    ctx.strokeStyle = "gray";
-    ctx.beginPath();
-    ctx.arc(cx, cy, R, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // 内側の円
-    const innerX = cx + (R - r) * Math.cos(t);
-    const innerY = cy + (R - r) * Math.sin(t);
-    ctx.beginPath();
-    ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // ペンの位置
-    const penX = innerX + p * r * Math.cos(((R - r) / r) * t);
-    const penY = innerY - p * r * Math.sin(((R - r) / r) * t);
-    ctx.strokeStyle = "red";
-    ctx.beginPath();
-    ctx.moveTo(innerX, innerY);
-    ctx.lineTo(penX, penY);
-    ctx.stroke();
-
     // スピログラフの描画
     ctx.strokeStyle = "blue";
     ctx.beginPath();
-    for (let i = 0; i <= t; i += 0.01) {
+
+    const step = drawSpeed; // tの増分量を描画速度に基づいて変更
+    for (let i = t; i < t + step && i <= maxT; i += 0.01) {
       const x = cx + (R - r) * Math.cos(i) + p * r * Math.cos(((R - r) / r) * i);
       const y = cy + (R - r) * Math.sin(i) - p * r * Math.sin(((R - r) / r) * i);
-      if (i === 0) ctx.moveTo(x, y);
+      if (i === t) ctx.moveTo(x, y);
       else ctx.lineTo(x, y);
     }
+
     ctx.stroke();
 
-    t += drawSpeed; // アニメーション内の速度変更
+    t += step; // アニメーション速度に応じて進行
     animationFrameId = requestAnimationFrame(drawFrame);
   }
+
+  drawFrame();
+}
+
 
   drawFrame();
 }
