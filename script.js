@@ -90,9 +90,6 @@ function drawSpirographAnimated(R, r, p) {
 }
 
 
-  drawFrame();
-}
-
 // 最大公約数を求める関数
 function gcd(a, b) {
   return b === 0 ? a : gcd(b, a % b);
