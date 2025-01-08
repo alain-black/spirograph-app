@@ -102,7 +102,7 @@ function drawSpirographAnimated(R, r, p) {
     }
     ctx.stroke();
 
-    t += 0.02;
+    t += drawSpeed; // アニメーション内の速度変更
     animationFrameId = requestAnimationFrame(drawFrame);
   }
 
@@ -138,4 +138,4 @@ drawSpeedInput.addEventListener('input', () => {
   drawSpeed = parseFloat(drawSpeedInput.value);
 });
 
-t += drawSpeed; // アニメーション内の速度変更
+
