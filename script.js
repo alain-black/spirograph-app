@@ -5,7 +5,10 @@ const outerRadiusInput = document.getElementById('outerRadius');
 const innerRadiusInput = document.getElementById('innerRadius');
 const penPositionInput = document.getElementById('penPosition');
 const drawButton = document.getElementById('drawButton');
+const drawSpeedInput = document.getElementById('drawSpeed');
 
+
+let drawSpeed = parseFloat(drawSpeedInput.value);
 let animationFrameId = null; // アニメーション用のID
 
 // キャンバスサイズをブラウザの高さに基づいた正方形に設定
@@ -129,3 +132,10 @@ drawSpirographStatic(
   parseFloat(innerRadiusInput.value),
   parseFloat(penPositionInput.value)
 );
+
+
+drawSpeedInput.addEventListener('input', () => {
+  drawSpeed = parseFloat(drawSpeedInput.value);
+});
+
+t += drawSpeed; // アニメーション内の速度変更
