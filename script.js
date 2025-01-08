@@ -57,37 +57,64 @@ function drawSpirographAnimated(R, r, p) {
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
   let t = 0;
+  let previousX = null;
+  let previousY = null;
 
-  ctx.lineWidth = 1;
-
-  function drawFrame() {
-    const maxT = Math.PI * 2 * r / gcd(R, r); // スピログラフが1周する最大時間
-
-    if (t >= maxT) {
-      cancelAnimationFrame(animationFrameId);
-      return; // 描画終了
-    }
-
-    // スピログラフの描画
-    ctx.strokeStyle = "blue";
+  function drawStaticElements() {
+    // 外側の円
+    ctx.strokeStyle = "gray";
     ctx.beginPath();
-
-    const step = drawSpeed; // tの増分量を描画速度に基づいて変更
-    for (let i = t; i < t + step && i <= maxT; i += 0.01) {
-      const x = cx + (R - r) * Math.cos(i) + p * r * Math.cos(((R - r) / r) * i);
-      const y = cy + (R - r) * Math.sin(i) - p * r * Math.sin(((R - r) / r) * i);
-      if (i === t) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
     ctx.stroke();
 
-    t += step; // アニメーション速度に応じて進行
+    // 内側の円
+    const innerX = cx + (R - r) * Math.cos(t);
+    const innerY = cy + (R - r) * Math.sin(t);
+    ctx.beginPath();
+    ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  function drawFrame() {
+    if (t >= Math.PI * 2 * r / gcd(R, r)) {
+      cancelAnimationFrame(animationFrameId);
+      return;
+    }
+
+    // 描画のリセット
+    ctx.globalAlpha = 1.0; // 不透明度をリセット
+    ctx.setLineDash([]);   // 点線パターンをリセット
+    ctx.lineWidth = 1;     // 線の太さをリセット
+
+    // キャンバス全体をクリア
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 静的要素を描画
+    drawStaticElements();
+
+    // 現在のペン位置を計算
+    const x = cx + (R - r) * Math.cos(t) + p * r * Math.cos(((R - r) / r) * t);
+    const y = cy + (R - r) * Math.sin(t) - p * r * Math.sin(((R - r) / r) * t);
+
+    // 線を描画
+    if (previousX !== null && previousY !== null) {
+      ctx.strokeStyle = "blue";
+      ctx.beginPath();
+      ctx.moveTo(previousX, previousY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
+
+    previousX = x;
+    previousY = y;
+
+    t += drawSpeed;
     animationFrameId = requestAnimationFrame(drawFrame);
   }
 
   drawFrame();
 }
+
 
 
 // 最大公約数を求める関数
