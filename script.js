@@ -57,9 +57,11 @@ function drawSpirographAnimated(R, r, p) {
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
   let t = 0;
-  let previousX = null;
-  let previousY = null;
 
+  // スピログラフ全体を保持するための配列
+  const points = [];
+
+  // 外円と内円を描画（最初のフレームでのみ）
   function drawStaticElements() {
     // 外側の円
     ctx.strokeStyle = "gray";
@@ -75,45 +77,44 @@ function drawSpirographAnimated(R, r, p) {
     ctx.stroke();
   }
 
+  // 描画フレーム
   function drawFrame() {
     if (t >= Math.PI * 2 * r / gcd(R, r)) {
       cancelAnimationFrame(animationFrameId);
-      return;
+      return; // 描画終了
     }
 
-    // 描画のリセット
-    ctx.globalAlpha = 1.0; // 不透明度をリセット
-    ctx.setLineDash([]);   // 点線パターンをリセット
-    ctx.lineWidth = 1;     // 線の太さをリセット
-
-    // キャンバス全体をクリア
+    // クリア & 静的要素描画
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 静的要素を描画
     drawStaticElements();
 
-    // 現在のペン位置を計算
+    // ペンの現在位置を計算
     const x = cx + (R - r) * Math.cos(t) + p * r * Math.cos(((R - r) / r) * t);
     const y = cy + (R - r) * Math.sin(t) - p * r * Math.sin(((R - r) / r) * t);
 
-    // 線を描画
-    if (previousX !== null && previousY !== null) {
-      ctx.strokeStyle = "blue";
-      ctx.beginPath();
-      ctx.moveTo(previousX, previousY);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-    }
+    // 新しい点を追加
+    points.push({ x, y });
 
-    previousX = x;
-    previousY = y;
+    // スピログラフの線を描画
+    ctx.strokeStyle = "blue";
+    ctx.beginPath();
+    points.forEach((point, index) => {
+      if (index === 0) {
+        ctx.moveTo(point.x, point.y);
+      } else {
+        ctx.lineTo(point.x, point.y);
+      }
+    });
+    ctx.stroke();
 
+    // 時間を進める
     t += drawSpeed;
     animationFrameId = requestAnimationFrame(drawFrame);
   }
 
   drawFrame();
 }
+
 
 
 
