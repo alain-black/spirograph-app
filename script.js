@@ -50,64 +50,52 @@ function drawSpirographStatic(R, r, p) {
   ctx.stroke();
 }
 
-// 歯車を描画する関数
-function drawGear(cx, cy, radius, teethCount, angleOffset, color) {
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-
-  ctx.beginPath();
-  for (let i = 0; i < teethCount; i++) {
-    const angle1 = (i / teethCount) * Math.PI * 2 + angleOffset;
-    const angle2 = ((i + 0.5) / teethCount) * Math.PI * 2 + angleOffset;
-
-    const x1 = cx + radius * Math.cos(angle1);
-    const y1 = cy + radius * Math.sin(angle1);
-    const x2 = cx + (radius + 5) * Math.cos(angle2);
-    const y2 = cy + (radius + 5) * Math.sin(angle2);
-
-    ctx.lineTo(x1, y1);
-    ctx.lineTo(x2, y2);
-  }
-  ctx.closePath();
-  ctx.stroke();
-}
-
-// 歯車付きのスピログラフを描画する関数
-function drawSpirographWithGears(R, r, p) {
+// スピログラフを描画する関数（アニメーション付き）
+function drawSpirographAnimated(R, r, p) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
-  const teethCountOuter = Math.ceil(R / 10); // 外歯車の歯の数
-  const teethCountInner = Math.ceil(r / 5); // 内歯車の歯の数
   let t = 0;
+
+  // スピログラフ全体を保持するための配列
   const points = [];
 
+  // 外円と内円を描画（最初のフレームでのみ）
+  function drawStaticElements() {
+    // 外側の円
+    ctx.strokeStyle = "gray";
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // 内側の円
+    const innerX = cx + (R - r) * Math.cos(t);
+    const innerY = cy + (R - r) * Math.sin(t);
+    ctx.beginPath();
+    ctx.arc(innerX, innerY, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // 描画フレーム
   function drawFrame() {
     if (t >= Math.PI * 2 * r / gcd(R, r)) {
       cancelAnimationFrame(animationFrameId);
-      return;
+      return; // 描画終了
     }
 
+    // クリア & 静的要素描画
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // 外歯車
-    drawGear(cx, cy, R, teethCountOuter, 0, "gray");
-
-    // 内歯車の中心位置
-    const innerX = cx + (R - r) * Math.cos(t);
-    const innerY = cy + (R - r) * Math.sin(t);
-    const angleOffset = -((R - r) / r) * t;
-
-    // 内歯車
-    drawGear(innerX, innerY, r, teethCountInner, angleOffset, "black");
+    drawStaticElements();
 
     // ペンの現在位置を計算
-    const penX = innerX + p * r * Math.cos(angleOffset);
-    const penY = innerY + p * r * Math.sin(angleOffset);
+    const x = cx + (R - r) * Math.cos(t) + p * r * Math.cos(((R - r) / r) * t);
+    const y = cy + (R - r) * Math.sin(t) - p * r * Math.sin(((R - r) / r) * t);
+
+    // 新しい点を追加
+    points.push({ x, y });
 
     // スピログラフの線を描画
-    points.push({ x: penX, y: penY });
     ctx.strokeStyle = "blue";
     ctx.beginPath();
     points.forEach((point, index) => {
@@ -119,12 +107,17 @@ function drawSpirographWithGears(R, r, p) {
     });
     ctx.stroke();
 
+    // 時間を進める
     t += drawSpeed;
     animationFrameId = requestAnimationFrame(drawFrame);
   }
 
   drawFrame();
 }
+
+
+
+
 
 // 最大公約数を求める関数
 function gcd(a, b) {
@@ -151,14 +144,8 @@ drawSpirographStatic(
 );
 
 
-// 描画ボタンのイベントリスナーを更新
-drawButton.addEventListener('click', () => {
-  cancelAnimationFrame(animationFrameId);
-
-  const R = parseFloat(outerRadiusInput.value);
-  const r = parseFloat(innerRadiusInput.value);
-  const p = parseFloat(penPositionInput.value);
-
-  drawSpirographWithGears(R, r, p);
+drawSpeedInput.addEventListener('input', () => {
+  drawSpeed = parseFloat(drawSpeedInput.value);
 });
+
 
